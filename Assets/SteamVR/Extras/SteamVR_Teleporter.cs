@@ -12,6 +12,7 @@ public class SteamVR_Teleporter : MonoBehaviour
 
 	public bool teleportOnClick = false;
 	public TeleportType teleportType = TeleportType.TeleportTypeUseZeroY;
+	RaycastHit hitInfo;
 
 	Transform reference
 	{
@@ -64,14 +65,13 @@ public class SteamVR_Teleporter : MonoBehaviour
 			float dist = 0f;
 			if (teleportType == TeleportType.TeleportTypeUseTerrain) // If we picked to use the terrain
 			{
-				RaycastHit hitInfo;
 				TerrainCollider tc = Terrain.activeTerrain.GetComponent<TerrainCollider>();
 				hasGroundTarget = tc.Raycast(ray, out hitInfo, 1000f);
 				dist = hitInfo.distance;
 			}
 			else if (teleportType == TeleportType.TeleportTypeUseCollider) // If we picked to use the collider
 			{
-				RaycastHit hitInfo;
+				
 				hasGroundTarget = Physics.Raycast(ray, out hitInfo);
 				dist = hitInfo.distance;
 			}
@@ -82,16 +82,17 @@ public class SteamVR_Teleporter : MonoBehaviour
 				hasGroundTarget = plane.Raycast(ray, out dist);
 			}
 
-			if (hasGroundTarget)
-			{
-				// Get the current Camera (head) position on the ground relative to the world
-				Vector3 headPosOnGround = new Vector3(SteamVR_Render.Top().head.position.x, refY, SteamVR_Render.Top().head.position.z);
+			if (hasGroundTarget) {
+				if (hitInfo.collider.tag == "Road") {
+					// Get the current Camera (head) position on the ground relative to the world
+					Vector3 headPosOnGround = new Vector3 (SteamVR_Render.Top ().head.position.x, refY, SteamVR_Render.Top ().head.position.z);
 
-				// We need to translate the reference space along the same vector
-				// that is between the head's position on the ground and the intersection point on the ground
-				// i.e. intersectionPoint - headPosOnGround = translateVector
-				// currentReferencePosition + translateVector = finalPosition
-				t.position = t.position + (ray.origin + (ray.direction * dist)) - headPosOnGround;
+					// We need to translate the reference space along the same vector
+					// that is between the head's position on the ground and the intersection point on the ground
+					// i.e. intersectionPoint - headPosOnGround = translateVector
+					// currentReferencePosition + translateVector = finalPosition
+					t.position = t.position + (ray.origin + (ray.direction * dist)) - headPosOnGround;
+				}
 			}
 		}
 	}
