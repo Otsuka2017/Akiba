@@ -16,7 +16,8 @@ public delegate void PointerEventHandler(object sender, PointerEventArgs e);
 public class SteamVR_LaserPointer : MonoBehaviour
 {
     public bool active = true;
-    public Color color;
+	public Color color1;
+	public Color color2;
     public float thickness = 0.002f;
     public GameObject holder;
     public GameObject pointer;
@@ -59,7 +60,7 @@ public class SteamVR_LaserPointer : MonoBehaviour
             }
         }
         Material newMaterial = new Material(Shader.Find("Unlit/Color"));
-        newMaterial.SetColor("_Color", color);
+        newMaterial.SetColor("_Color", color1);
         pointer.GetComponent<MeshRenderer>().material = newMaterial;
 	}
 
@@ -92,6 +93,26 @@ public class SteamVR_LaserPointer : MonoBehaviour
         Ray raycast = new Ray(transform.position, transform.forward);
         RaycastHit hit;
         bool bHit = Physics.Raycast(raycast, out hit);
+
+		//Change lasercolor//
+		Material lasercolor = pointer.GetComponent<MeshRenderer>().material;
+		if (bHit)
+		{
+			pointer.GetComponent<MeshRenderer>().enabled = true;
+			if (hit.collider.tag == "Road") 
+			{
+				lasercolor.SetColor ("_Color", color2);
+			}
+			else
+			{	
+				lasercolor.SetColor ("_Color", color1);
+			}
+		} 
+		else 
+		{
+			pointer.GetComponent<MeshRenderer> ().enabled = false;
+		}
+		//Change lasercolor End//
 
         if(previousContact && previousContact != hit.transform)
         {
